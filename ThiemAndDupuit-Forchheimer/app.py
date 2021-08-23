@@ -47,9 +47,10 @@ app.layout = html.Div([
         ),
     ], style={'width': '80%', 'display': 'inline-block', 'padding': '0 20', 'vertical-align': 'middle', 'margin-bottom': 30, 'margin-right': 50, 'margin-left': 20}),
 
+    #from: https://github.com/plotly/dash/issues/71
     html.Div([
-        html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()), style={'width': '800px'})
-    ]),
+        html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()), style={'width': '600px'})
+    ], style={'width': '100%', 'margin-left': '200px', 'margin-bottom': '50px'}),
 
     #Tabs: https://dash.plotly.com/dash-core-components/tabs
     html.Div([

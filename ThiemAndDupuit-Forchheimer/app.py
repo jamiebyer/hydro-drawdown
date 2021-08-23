@@ -15,6 +15,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import base64
 
 import plotly.graph_objects as go
 import numpy as np
@@ -32,6 +33,9 @@ app = dash.Dash(
 )
 
 
+image_filename = 'confined_aquifer.png'
+encoded_image = base64.b64encode(open(image_filename, 'rb').read())
+
 app.layout = html.Div([
 
     html.Div([
@@ -42,6 +46,10 @@ app.layout = html.Div([
             '''
         ),
     ], style={'width': '80%', 'display': 'inline-block', 'padding': '0 20', 'vertical-align': 'middle', 'margin-bottom': 30, 'margin-right': 50, 'margin-left': 20}),
+
+    html.Div([
+        html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()), style={'width': '800px'})
+    ]),
 
     #Tabs: https://dash.plotly.com/dash-core-components/tabs
     html.Div([

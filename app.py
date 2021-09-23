@@ -32,33 +32,45 @@ app = dash.Dash(
     suppress_callback_exceptions=True #because of the tabs, not all callbacks are accessible so we suppress callback exceptions
 )
 
+introduction = open('introduction.md', 'r')
+introduction_markdown = introduction.read()
 
-image_filename = 'confined_aquifer.png'
-encoded_image = base64.b64encode(open(image_filename, 'rb').read())
+sources = open('sources.md', 'r')
+sources_markdown = sources.read()
+
+
+confined_image_filename = 'confined_aquifer.png'
+confined_encoded_image = base64.b64encode(open(confined_image_filename, 'rb').read())
+unconfined_image_filename = 'unconfined_aquifer.png'
+unconfined_encoded_image = base64.b64encode(open(unconfined_image_filename, 'rb').read())
 
 app.layout = html.Div([
 
     html.Div([
         dcc.Markdown(
-            '''
-            # EOSC 325
-            ----
-            '''
+            children=introduction_markdown
         ),
     ], style={'width': '80%', 'display': 'inline-block', 'padding': '0 20', 'vertical-align': 'middle', 'margin-bottom': 30, 'margin-right': 50, 'margin-left': 20}),
 
     #from: https://github.com/plotly/dash/issues/71
     html.Div([
-        html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()), style={'width': '600px'})
-    ], style={'width': '100%', 'margin-left': '200px', 'margin-bottom': '50px'}),
+        html.Img(src='data:image/png;base64,{}'.format(confined_encoded_image.decode()), style={'width': '450px'}),
+        html.Img(src='data:image/png;base64,{}'.format(unconfined_encoded_image.decode()), style={'width': '490px'})
+    ], style={'width': '100%', 'margin-left': '30px', 'margin-bottom': '50px'}),
 
     #Tabs: https://dash.plotly.com/dash-core-components/tabs
     html.Div([
         dcc.Tabs(id='tabs', value='thiem', children=[
-            dcc.Tab(label='The Thiem Equation', value='thiem'),
-            dcc.Tab(label='The Dupuit-Forchheimer Equation', value='d-f'),
+            dcc.Tab(label='Confined Aquifer (Thiem)', value='thiem'),
+            dcc.Tab(label='Unconfined Aquifer (Dupuit-Forchheimer)', value='d-f'),
         ]),
         html.Div(id='tabs-content')
+    ], style={'width': '80%', 'display': 'inline-block', 'padding': '0 20', 'vertical-align': 'middle', 'margin-bottom': 30, 'margin-right': 50, 'margin-left': 20}),
+
+    html.Div([
+        dcc.Markdown(
+            children=sources_markdown
+        ),
     ], style={'width': '80%', 'display': 'inline-block', 'padding': '0 20', 'vertical-align': 'middle', 'margin-bottom': 30, 'margin-right': 50, 'margin-left': 20}),
 
 ], style={'width': '1200px'})
@@ -216,7 +228,7 @@ def update_plot(Q, T, r1, r2):
 
     fig = go.Figure(go.Scatter(x=x, y=abs(h1), mode='lines'))
     fig.update_layout(title='Estimated Steady State Drawdown', xaxis_title='r (m)', yaxis_title='drawdown (m)')
-    fig.update_yaxes(range=[80, -10])
+    fig.update_yaxes(range=[-10, 80])
     fig.update_xaxes(ticks="outside")
     return fig
 
@@ -240,7 +252,7 @@ def update_plot(Q, K, r1, r2):
 
     fig = go.Figure(go.Scatter(x=x, y=abs(h1), mode='lines'))
     fig.update_layout(xaxis_title='r (m)', yaxis_title='drawdown (m)')
-    fig.update_yaxes(range=[80, -10])
+    fig.update_yaxes(range=[-10, 80])
     fig.update_xaxes(ticks="outside")
     return fig
 

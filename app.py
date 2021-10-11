@@ -69,6 +69,12 @@ app.layout = html.Div([
 
     html.Div([
         dcc.Markdown(
+            '''The well radius (rw) is 0.15m.'''
+        ),
+    ], style={'width': '100%'}),
+
+    html.Div([
+        dcc.Markdown(
             children=sources_markdown
         ),
     ], style={'width': '80%', 'display': 'inline-block', 'padding': '0 20', 'vertical-align': 'middle', 'margin-bottom': 30, 'margin-right': 50, 'margin-left': 20}),
@@ -110,21 +116,8 @@ def render_content(tab):
                                 **Aquifer Transmissivity (T) (m\u00B2/d):**
                             '''),
                         dcc.Slider(
-                            id='T', min=0, max=50, step=1, value=8,
-                            marks={0: '0', 50: '50'},
-                            tooltip={'always_visible': True, 'placement': 'topLeft'}
-                        ),
-                    ]),
-
-                html.Div(
-                    id='r1_container',
-                    children=[
-                        dcc.Markdown('''
-                                    **Inner Radius (r\u2081) (m):**
-                                '''),
-                        dcc.Slider(
-                            id='r1', min=0, max=2, step=0.01, value=0.1,
-                            marks={0: '0', 2: '2'},
+                            id='T', min=1, max=50, step=1, value=8,
+                            marks={1: '1', 50: '50'},
                             tooltip={'always_visible': True, 'placement': 'topLeft'}
                         ),
                     ]),
@@ -136,8 +129,8 @@ def render_content(tab):
                                     **Outer Radius (r\u2082) (m):**
                                 '''),
                         dcc.Slider(
-                            id='r2', min=10, max=1000, step=1, value=1000,
-                            marks={10: '10', 1000: '1000'},
+                            id='r2', min=30, max=1000, step=10, value=1000,
+                            marks={30: '30', 1000: '1000'},
                             tooltip={'always_visible': True, 'placement': 'topLeft'}
                         ),
                     ]),
@@ -175,21 +168,8 @@ def render_content(tab):
                                         **Hydraulic Conductivity (K) (m\u00B2/d):**
                                     '''),
                         dcc.Slider(
-                            id='K', min=0, max=50, step=1, value=8,
-                            marks={0: '0', 50: '50'},
-                            tooltip={'always_visible': True, 'placement': 'topLeft'}
-                        ),
-                    ]),
-
-                html.Div(
-                    id='r1_container',
-                    children=[
-                        dcc.Markdown('''
-                                            **Inner Radius (r\u2081) (m):**
-                                        '''),
-                        dcc.Slider(
-                            id='r1', min=0, max=2, step=0.01, value=0.1,
-                            marks={0: '0', 2: '2'},
+                            id='K', min=1, max=50, step=1, value=8,
+                            marks={1: '1', 50: '50'},
                             tooltip={'always_visible': True, 'placement': 'topLeft'}
                         ),
                     ]),
@@ -201,8 +181,8 @@ def render_content(tab):
                                             **Outer Radius (r\u2082) (m):**
                                         '''),
                         dcc.Slider(
-                            id='r2', min=10, max=1000, step=1, value=1000,
-                            marks={10: '10', 1000: '1000'},
+                            id='r2', min=30, max=1000, step=10, value=1000,
+                            marks={30: '30', 1000: '1000'},
                             tooltip={'always_visible': True, 'placement': 'topLeft'}
                         ),
                     ]),
@@ -217,19 +197,21 @@ def render_content(tab):
     Output(component_id='thiem_plot', component_property='figure'),
     Input(component_id='Q', component_property='value'),
     Input(component_id='T', component_property='value'),
-    Input(component_id='r1', component_property='value'),
     Input(component_id='r2', component_property='value'),
 )
-def update_plot(Q, T, r1, r2):
+def update_plot(Q, T, r2):
     h2 = 0
-    x = np.linspace(r1 + (r2/1000), r2, 1000)
+    rw = 0.15
+    x = np.append(np.arange(rw, 30.15, 0.15), np.arange(30, 1010, 10))
 
-    h1 = calc.h1(Q, T, h2, r1, x)
+    h1 = calc.h1_thiem(Q, T, h2, rw, x)
+    s = abs(h1)-max(abs(h1))
 
-    fig = go.Figure(go.Scatter(x=x, y=abs(h1), mode='lines'))
+    fig = go.Figure(go.Scatter(x=x, y=s, mode='lines'))
     fig.update_layout(title='Estimated Steady State Drawdown', xaxis_title='r (m)', yaxis_title='drawdown (m)')
-    fig.update_yaxes(range=[-10, 80])
-    fig.update_xaxes(ticks="outside")
+    fig.update_yaxes(range=[-80, 10])
+    fig.update_xaxes(ticks="outside", range=[0, 1000])
+    fig.add_vline(x=r2, annotation_text='r2')
     return fig
 
 
@@ -241,19 +223,21 @@ def update_plot(Q, T, r1, r2):
     Output(component_id='d-f_plot', component_property='figure'),
     Input(component_id='Q', component_property='value'),
     Input(component_id='K', component_property='value'),
-    Input(component_id='r1', component_property='value'),
     Input(component_id='r2', component_property='value'),
 )
-def update_plot(Q, K, r1, r2):
+def update_plot(Q, K, r2):
     h2 = 0
-    x = np.linspace(r1 + (r2/1000), r2, 1000)
+    rw = 0.15
+    x = np.append(np.arange(rw, 30.15, 0.15), np.arange(30, 1010, 10))
 
-    h1 = calc.h1(Q, K, h2, r1, x)
+    h1 = calc.h1_df(Q, K, h2, rw, x)
+    s = abs(h1)-max(abs(h1))
 
-    fig = go.Figure(go.Scatter(x=x, y=abs(h1), mode='lines'))
+    fig = go.Figure(go.Scatter(x=x, y=s, mode='lines'))
     fig.update_layout(xaxis_title='r (m)', yaxis_title='drawdown (m)')
-    fig.update_yaxes(range=[-10, 80])
-    fig.update_xaxes(ticks="outside")
+    fig.update_yaxes(range=[-15, 5])
+    fig.update_xaxes(ticks="outside", range=[0, 1000])
+    fig.add_vline(x=r2, annotation_text='r2')
     return fig
 
 

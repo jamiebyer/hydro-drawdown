@@ -12,8 +12,8 @@ from flask import Flask
 from os import environ
 
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output
 import base64
 
@@ -39,9 +39,9 @@ sources = open('sources.md', 'r')
 sources_markdown = sources.read()
 
 
-confined_image_filename = 'confined_aquifer.png'
+confined_image_filename = 'confined_aquifer_eqn.png'
 confined_encoded_image = base64.b64encode(open(confined_image_filename, 'rb').read())
-unconfined_image_filename = 'unconfined_aquifer.png'
+unconfined_image_filename = 'unconfined_aquifer_eqn.png'
 unconfined_encoded_image = base64.b64encode(open(unconfined_image_filename, 'rb').read())
 
 app.layout = html.Div([
@@ -208,7 +208,7 @@ def update_plot(Q, T, r2):
     s = abs(h1)-max(abs(h1))
 
     fig = go.Figure(go.Scatter(x=x, y=s, mode='lines'))
-    fig.update_layout(title='Estimated Steady State Drawdown', xaxis_title='r (m)', yaxis_title='drawdown (m)')
+    fig.update_layout(title='Steady state drawdown (confined aquifer), s = h2 - h1', xaxis_title='r (m)', yaxis_title='drawdown, s (m)')
     fig.update_yaxes(range=[-80, 10])
     fig.update_xaxes(ticks="outside", range=[0, 1000])
     fig.add_vline(x=r2, annotation_text='r2')
@@ -234,7 +234,7 @@ def update_plot(Q, K, r2):
     s = abs(h1)-max(abs(h1))
 
     fig = go.Figure(go.Scatter(x=x, y=s, mode='lines'))
-    fig.update_layout(xaxis_title='r (m)', yaxis_title='drawdown (m)')
+    fig.update_layout(title='Steady state drawdown (unconfined aquifer), s = h2 - h1', xaxis_title='r (m)', yaxis_title='drawdown, s (m)')
     fig.update_yaxes(range=[-15, 5])
     fig.update_xaxes(ticks="outside", range=[0, 1000])
     fig.add_vline(x=r2, annotation_text='r2')

@@ -223,12 +223,12 @@ def update_plot(Q, T, r2):
     x = np.append(np.arange(rw, 30.15, 0.15), np.arange(30, r2+10, 10))
 
     h1 = calc.h1_thiem(Q, (10**T), h2, rw, x)
-    s = abs(h1)
+    s = abs(h1)-abs(h1[-1])
 
     fig = go.Figure(go.Scatter(x=x, y=s, mode='lines'))
     fig.update_layout(title='Steady state drawdown (confined aquifer), s = h2 - h1', xaxis_title='r (m)', yaxis_title='drawdown, s (m)')
-    fig.update_yaxes(range=[-2, 80])
-    fig.update_xaxes(ticks="outside", range=[-10, r2])
+    fig.update_yaxes(range=[-80, 2])
+    fig.update_xaxes(ticks="outside", range=[-0.01*r2, r2])
     return fig
 
 
@@ -248,12 +248,12 @@ def update_plot(Q, K, r2):
     x = np.append(np.arange(rw, 30.15, 0.15), np.arange(30, r2 + 10, 10))
 
     h1 = calc.h1_df(Q, (10**K), h2, rw, x)
-    s = abs(h1)
+    s = abs(h1)-abs(h1[-1])
 
     fig = go.Figure(go.Scatter(x=x, y=s, mode='lines'))
     fig.update_layout(title='Steady state drawdown (unconfined aquifer), s = h2 - h1', xaxis_title='r (m)', yaxis_title='drawdown, s (m)')
-    fig.update_yaxes(range=[-0.5, 15])
-    fig.update_xaxes(ticks="outside", range=[-10, r2])
+    fig.update_yaxes(range=[-15, 0.5])
+    fig.update_xaxes(ticks="outside", range=[-0.01*r2, r2])
     return fig
 
 

@@ -44,6 +44,11 @@ confined_encoded_image = base64.b64encode(open(confined_image_filename, 'rb').re
 unconfined_image_filename = 'unconfined_aquifer_eqn.png'
 unconfined_encoded_image = base64.b64encode(open(unconfined_image_filename, 'rb').read())
 
+initial_Q = 300
+initial_T = 1
+initial_K = 1
+initial_r2 = 1000
+
 app.layout = html.Div([
 
     html.Div([
@@ -99,39 +104,31 @@ def render_content(tab):
                 html.Div(
                     id='Q_container',
                     children=[
-                        dcc.Markdown('''
-                            **Well Discharge (Q) (m\u00B3/d):**
-                        '''),
+                        dcc.Markdown(id='Q_label', children=''' **Well Discharge (Q) = ''' + str(initial_Q) + '''m\u00B3/d**'''),
                         dcc.Slider(
-                            id='Q', min=0, max=500, step=1, value=272.83,
-                            marks={0: '0', 500: '500'},
-                            tooltip={'always_visible': True, 'placement': 'topLeft'}
+                            id='Q', min=0, max=500, step=1, value=initial_Q,
+                            marks={0: '0', 100: '100', 200: '200', 300:'300', 400:'400', 500: '500'},
                         ),
                     ]),
 
                 html.Div(
                     id='T_container',
                     children=[
-                        dcc.Markdown('''
-                                **Aquifer Transmissivity (T) (m\u00B2/d):**
-                            '''),
+                        dcc.Markdown(id='T_label', children=''' **Aquifer Transmissivity (T) = ''' + str(10**initial_T) + '''m\u00B2/d**'''),
                         dcc.Slider(
-                            id='T', min=1, max=50, step=1, value=8,
-                            marks={1: '1', 50: '50'},
-                            tooltip={'always_visible': True, 'placement': 'topLeft'}
+                            #0.01-1000
+                            id='T', min=-2, max=3, step=0.01, value=initial_T,
+                            marks={-2:'10\u207B\u00B2', -1:'10\u207B\u00B9', 0:'1', 1:'10', 2:'10\u00B2', 3:'10\u00B3'},
                         ),
                     ]),
 
                 html.Div(
                     id='r2_container',
                     children=[
-                        dcc.Markdown('''
-                                    **Outer Radius (r\u2082) (m):**
-                                '''),
+                        dcc.Markdown(id='r2_label', children=''' **Outer radius (r\u2082) = ''' + str(initial_r2) + '''m**'''),
                         dcc.Slider(
-                            id='r2', min=30, max=1000, step=10, value=1000,
-                            marks={30: '30', 1000: '1000'},
-                            tooltip={'always_visible': True, 'placement': 'topLeft'}
+                            id='r2', min=30, max=1000, step=10, value=initial_r2,
+                            marks={30: '30', 200: '200', 400: '400', 600: '600', 800: '800', 1000: '1000'},
                         ),
                     ]),
             ], style={'width': '30%', 'display': 'inline-block', 'vertical-align': 'middle'})
@@ -151,44 +148,65 @@ def render_content(tab):
                 html.Div(
                     id='Q_container',
                     children=[
-                        dcc.Markdown('''
-                                    **Well Discharge (Q) (m\u00B3/d):**
-                                '''),
+                        dcc.Markdown(id='Q_label', children=''' **Well Discharge (Q) = ''' + str(initial_Q) + '''m\u00B3/d**'''),
                         dcc.Slider(
-                            id='Q', min=0, max=500, step=1, value=272.83,
-                            marks={0: '0', 500: '500'},
-                            tooltip={'always_visible': True, 'placement': 'topLeft'}
+                            id='Q', min=0, max=500, step=1, value=initial_Q,
+                            marks={0: '0', 100: '100', 200: '200', 300:'300', 400:'400', 500: '500'},
                         ),
                     ]),
 
                 html.Div(
                     id='K_container',
                     children=[
-                        dcc.Markdown('''
-                                        **Hydraulic Conductivity (K) (m\u00B2/d):**
-                                    '''),
+                        dcc.Markdown(id='K_label', children=''' **Hydraulic Conductivity (K) = ''' + str(10**initial_K) + '''m/d**'''),
                         dcc.Slider(
-                            id='K', min=1, max=50, step=1, value=8,
-                            marks={1: '1', 50: '50'},
-                            tooltip={'always_visible': True, 'placement': 'topLeft'}
+                            #0.001-1000
+                            id='K', min=-3, max=3, step=0.01, value=initial_K,
+                            marks={-3: '10\u207B\u00B3', -2: '10\u207B\u00B2', -1: '10\u207B\u00B9', 0: '1', 1: '10', 2: '10\u00B2', 3: '10\u00B3'},
                         ),
                     ]),
 
                 html.Div(
                     id='r2_container',
                     children=[
-                        dcc.Markdown('''
-                                            **Outer Radius (r\u2082) (m):**
-                                        '''),
+                        dcc.Markdown(id='r2_label', children=''' **Outer radius (r\u2082) = ''' + str(initial_r2) + '''m**'''),
                         dcc.Slider(
-                            id='r2', min=30, max=1000, step=10, value=1000,
-                            marks={30: '30', 1000: '1000'},
-                            tooltip={'always_visible': True, 'placement': 'topLeft'}
+                            id='r2', min=30, max=1000, step=10, value=initial_r2,
+                            marks={30: '30', 200: '200', 400: '400', 600: '600', 800: '800', 1000: '1000'},
                         ),
                     ]),
             ], style={'width': '30%', 'display': 'inline-block', 'vertical-align': 'middle'})
         ])
 
+
+#updating slider labels
+@app.callback(
+    Output(component_id='Q_label', component_property='children'),
+    Input(component_id='Q', component_property='value'),
+)
+def update_Q_label(Q):
+    return ''' **Well Discharge (Q) = ''' + str(Q) + '''m\u00B3/d**'''
+
+@app.callback(
+    Output(component_id='r2_label', component_property='children'),
+    Input(component_id='r2', component_property='value'),
+)
+def update_r2_label(r2):
+    return ''' **Outer radius (r\u2082) = ''' + str(r2) + '''m**'''
+
+@app.callback(
+    Output(component_id='K_label', component_property='children'),
+    Input(component_id='K', component_property='value'),
+)
+def update_K_label(K):
+    return ''' **Hydraulic Conductivity (K) = ''' + str(10**K)[:4] + '''m/d**'''
+
+@app.callback(
+    Output(component_id='T_label', component_property='children'),
+    Input(component_id='T', component_property='value'),
+)
+def update_T_label(T):
+    return ''' **Aquifer Transmissivity (T) = ''' + str(10**T)[:4] + '''m\u00B2/d**'''
 
 
 
@@ -204,7 +222,7 @@ def update_plot(Q, T, r2):
     rw = 0.15
     x = np.append(np.arange(rw, 30.15, 0.15), np.arange(30, r2+10, 10))
 
-    h1 = calc.h1_thiem(Q, T, h2, rw, x)
+    h1 = calc.h1_thiem(Q, (10**T), h2, rw, x)
     s = abs(h1)
 
     fig = go.Figure(go.Scatter(x=x, y=s, mode='lines'))
@@ -229,7 +247,7 @@ def update_plot(Q, K, r2):
     rw = 0.15
     x = np.append(np.arange(rw, 30.15, 0.15), np.arange(30, r2 + 10, 10))
 
-    h1 = calc.h1_df(Q, K, h2, rw, x)
+    h1 = calc.h1_df(Q, (10**K), h2, rw, x)
     s = abs(h1)
 
     fig = go.Figure(go.Scatter(x=x, y=s, mode='lines'))

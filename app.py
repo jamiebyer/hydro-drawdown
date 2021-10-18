@@ -96,6 +96,7 @@ def render_content(tab):
             html.Div([
                 dcc.Graph(
                     id='thiem_plot',
+                    config={'displayModeBar': True}
                 ),
 
             ], style={'width': '70%', 'display': 'inline-block', 'vertical-align': 'middle'}),
@@ -140,6 +141,7 @@ def render_content(tab):
             html.Div([
                 dcc.Graph(
                     id='d-f_plot',
+                    config={'displayModeBar': True}
                 ),
 
             ], style={'width': '70%', 'display': 'inline-block', 'vertical-align': 'middle'}),
